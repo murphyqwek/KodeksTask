@@ -1,4 +1,4 @@
-﻿namespace KodeksTestTask
+﻿namespace CLI
 {
     internal class Program
     {
