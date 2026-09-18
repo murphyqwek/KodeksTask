@@ -1,20 +1,28 @@
-﻿namespace Core.Model
+﻿namespace Core.Model;
+
+public sealed class Sale
 {
-    public class Sale
-    {
-        public int OrderId { get; init; }
-        public DateOnly OrderDate { get; init; }
-        public int CustomerId { get; init; }
+    public int OrderId { get; init; }
 
-        public required string ProductCategory { get; init; }
-        public required string Region { get; init; }
+    public DateOnly OrderDate { get; init; }
 
-        public decimal Discount { get; init; }
+    public int CustomerId { get; init; }
 
-        public required string PaymentMethod { get; init; }
+    public required string ProductCategory { get; init; }
 
-        public int DeliveryDays { get; init; }
-        public decimal CustomerRating { get; init; }
-        public decimal Revenue { get; init; }
-    }
+    public required string Region { get; init; }
+
+    public int Quantity { get; init; }
+
+    public decimal UnitPrice { get; init; }
+
+    public decimal Discount { get; init; }
+
+    public required string PaymentMethod { get; init; }
+
+    public int DeliveryDays { get; init; }
+
+    public decimal CustomerRating { get; init; }
+
+    public decimal Revenue { get; init; }
 }
