@@ -38,7 +38,7 @@ public sealed class CsvParser : ISaleParser
         catch (FieldValidationException ex)
         {
             throw new SaleParsingException(
-                $"Failed to parse sale: field '{ex.Field}' did not pass validation.",
+                $"Failed to parse sale: {ex.Message}",
                 ex);
         }
         catch (TypeConverterException ex)
