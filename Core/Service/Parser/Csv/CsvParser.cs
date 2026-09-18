@@ -47,7 +47,7 @@ public sealed class CsvParser : ISaleParser
                 $"Failed to parse sale: cannot convert value '{ex.Text}' to the required type.",
                 ex);
         }
-        catch (System.MissingFieldException ex)
+        catch (CsvHelper.MissingFieldException ex)
         {
             throw new SaleParsingException(
                 "Failed to parse sale: one or more required CSV fields are missing.",
