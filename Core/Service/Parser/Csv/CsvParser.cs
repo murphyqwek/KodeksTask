@@ -41,11 +41,11 @@ public sealed class CsvParser : ISaleParser
                 $"Failed to parse sale: {ex.Message}",
                 ex);
         }
-        catch (TypeConverterException ex)
+        catch (ReaderException ex) when (ex.InnerException is TypeConverterException typeException)
         {
             throw new SaleParsingException(
-                $"Failed to parse sale: cannot convert value '{ex.Text}' to the required type.",
-                ex);
+                $"Failed to parse sale: cannot convert value '{typeException.Text}' to the required type.",
+                typeException);
         }
         catch (CsvHelper.MissingFieldException ex)
         {
