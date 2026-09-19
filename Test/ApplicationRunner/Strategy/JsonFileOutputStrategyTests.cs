@@ -15,7 +15,7 @@ public sealed class JsonFileOutputStrategyTests
 
         string? receivedPath = null;
 
-        var writer = new Mock<IResultWriter>(MockBehavior.Strict);
+        var writer = new Mock<JsonResultWriter>(MockBehavior.Strict);
 
         writer.Setup(x => x.Write(result, textWriter));
 
@@ -49,7 +49,7 @@ public sealed class JsonFileOutputStrategyTests
 
         string? receivedPath = null;
 
-        var writer = new Mock<IResultWriter>(MockBehavior.Strict);
+        var writer = new Mock<JsonResultWriter>(MockBehavior.Strict);
 
         writer
             .Setup(x => x.WriteAsync(
@@ -82,7 +82,7 @@ public sealed class JsonFileOutputStrategyTests
     [InlineData("   ")]
     public async Task SyncStrategy_WhenOutputPathIsMissing_ShouldThrow(string? outputPath)
     {
-        var strategy = new JsonFileOutputStrategy(Mock.Of<IResultWriter>(), _ => new StringWriter());
+        var strategy = new JsonFileOutputStrategy(Mock.Of<JsonResultWriter>(), _ => new StringWriter());
 
         await Assert.ThrowsAsync<ArgumentException>(
             () => strategy.WriteAsync(
@@ -96,7 +96,7 @@ public sealed class JsonFileOutputStrategyTests
     [InlineData("   ")]
     public async Task AsyncStrategy_WhenOutputPathIsMissing_ShouldThrow(string? outputPath)
     {
-        var strategy = new JsonFileOutputAsyncStrategy(Mock.Of<IResultWriter>(), _ => new StringWriter());
+        var strategy = new JsonFileOutputAsyncStrategy(Mock.Of<JsonResultWriter>(), _ => new StringWriter());
 
         await Assert.ThrowsAsync<ArgumentException>(
             () => strategy.WriteAsync(
@@ -113,7 +113,7 @@ public sealed class JsonFileOutputStrategyTests
         using var cts = new CancellationTokenSource();
         var token = cts.Token;
 
-        var writer = new Mock<IResultWriter>(MockBehavior.Strict);
+        var writer = new Mock<JsonResultWriter>(MockBehavior.Strict);
 
         writer
             .Setup(x => x.WriteAsync(

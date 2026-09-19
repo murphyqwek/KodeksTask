@@ -4,10 +4,10 @@ using Core.Service.Writer;
 
 public sealed class JsonFileOutputStrategy : IOutputStrategy
 {
-    private readonly IResultWriter _writer;
+    private readonly JsonResultWriter _writer;
     private readonly Func<string, TextWriter> _writerFactory;
 
-    public JsonFileOutputStrategy(IResultWriter writer, Func<string, TextWriter>? writerFactory = null)
+    public JsonFileOutputStrategy(JsonResultWriter writer, Func<string, TextWriter>? writerFactory = null)
     {
         _writer = writer;
         _writerFactory = writerFactory ?? (path => new StreamWriter(path));

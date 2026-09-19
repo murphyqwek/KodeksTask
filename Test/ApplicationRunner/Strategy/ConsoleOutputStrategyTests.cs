@@ -12,13 +12,12 @@ public sealed class ConsoleOutputStrategyTests
     {
         var result = TestData.CreateAnalyticsResult();
 
-        var writer = new Mock<IResultWriter>(
+        var writer = new Mock<TextResultWriter>(
             MockBehavior.Strict);
 
         writer.Setup(x => x.Write(result, Console.Out));
 
-        var strategy = new ConsoleOutputStrategy(
-            writer.Object);
+        var strategy = new ConsoleOutputStrategy(writer.Object);
 
         await strategy.WriteAsync(result, null);
 
@@ -32,7 +31,7 @@ public sealed class ConsoleOutputStrategyTests
     [Fact]
     public async Task ConsoleOutputStrategy_WhenCancelled_ShouldNotWrite()
     {
-        var writer = new Mock<IResultWriter>(MockBehavior.Strict);
+        var writer = new Mock<TextResultWriter>(MockBehavior.Strict);
 
         var strategy = new ConsoleOutputStrategy(writer.Object);
 

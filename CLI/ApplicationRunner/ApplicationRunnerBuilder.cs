@@ -1,86 +1,93 @@
 ﻿using CLI.ApplicationRunner.Strategy.Analytics;
 using CLI.ApplicationRunner.Strategy.Input;
 using CLI.ApplicationRunner.Strategy.Output;
-using Core.Service.Analytics;
-using Core.Service.Csv;
-using Core.Service.Writer;
 
 namespace CLI.ApplicationRunner;
 
-public class ApplicationRunnerBuilder
+public sealed class ApplicationRunnerBuilder
 {
-    private readonly ICsvReader _csvReader;
-    private readonly IAnalyticsService _analyticsService;
-    private readonly IResultWriter _consoleWriter;
-    private readonly IResultWriter _jsonWriter;
+    private readonly SyncInputStrategy _syncInputStrategy;
+    private readonly AsyncInputStrategy _asyncInputStrategy;
+
+    private readonly SequentialAnalyticsStrategy _sequentialAnalyticsStrategy;
+    private readonly ParallelAnalyticsStrategy _parallelAnalyticsStrategy;
+    private readonly AsyncAnalyticsStrategy _asyncAnalyticsStrategy;
+
+    private readonly ConsoleOutputStrategy _consoleOutputStrategy;
+    private readonly JsonFileOutputStrategy _jsonFileOutputStrategy;
+    private readonly JsonFileOutputAsyncStrategy _jsonFileOutputAsyncStrategy;
 
     private IInputStrategy? _inputStrategy;
     private IAnalyticsStrategy? _analyticsStrategy;
     private IOutputStrategy? _outputStrategy;
 
     public ApplicationRunnerBuilder(
-        ICsvReader csvReader,
-        IAnalyticsService analyticsService,
-        TextResultWriter consoleWriter,
-        JsonResultWriter jsonWriter)
+        SyncInputStrategy syncInputStrategy,
+        AsyncInputStrategy asyncInputStrategy,
+        SequentialAnalyticsStrategy sequentialAnalyticsStrategy,
+        ParallelAnalyticsStrategy parallelAnalyticsStrategy,
+        AsyncAnalyticsStrategy asyncAnalyticsStrategy,
+        ConsoleOutputStrategy consoleOutputStrategy,
+        JsonFileOutputStrategy jsonFileOutputStrategy,
+        JsonFileOutputAsyncStrategy jsonFileOutputAsyncStrategy)
     {
-        _csvReader = csvReader;
-        _analyticsService = analyticsService;
-        _consoleWriter = consoleWriter;
-        _jsonWriter = jsonWriter;
+        _syncInputStrategy = syncInputStrategy;
+        _asyncInputStrategy = asyncInputStrategy;
+
+        _sequentialAnalyticsStrategy = sequentialAnalyticsStrategy;
+        _parallelAnalyticsStrategy = parallelAnalyticsStrategy;
+        _asyncAnalyticsStrategy = asyncAnalyticsStrategy;
+
+        _consoleOutputStrategy = consoleOutputStrategy;
+        _jsonFileOutputStrategy = jsonFileOutputStrategy;
+        _jsonFileOutputAsyncStrategy = jsonFileOutputAsyncStrategy;
     }
 
     public ApplicationRunnerBuilder UseSyncInput()
     {
-        _inputStrategy = new SyncInputStrategy(_csvReader);
+        _inputStrategy = _syncInputStrategy;
         return this;
     }
 
     public ApplicationRunnerBuilder UseAsyncInput()
     {
-        _inputStrategy = new AsyncInputStrategy(_csvReader);
+        _inputStrategy = _asyncInputStrategy;
         return this;
     }
 
     public ApplicationRunnerBuilder UseSequentialAnalytics()
     {
-        _analyticsStrategy = new SequentialAnalyticsStrategy(_analyticsService);
-
-        return this;
-    }
-
-    public ApplicationRunnerBuilder UseAsyncAnalytics()
-    {
-        _analyticsStrategy = new AsyncAnalyticsStrategy(_analyticsService);
-
+        _analyticsStrategy = _sequentialAnalyticsStrategy;
         return this;
     }
 
     public ApplicationRunnerBuilder UseParallelAnalytics()
     {
-        _analyticsStrategy = new ParallelAnalyticsStrategy(_analyticsService);
+        _analyticsStrategy = _parallelAnalyticsStrategy;
+        return this;
+    }
 
+    public ApplicationRunnerBuilder UseAsyncAnalytics()
+    {
+        _analyticsStrategy = _asyncAnalyticsStrategy;
         return this;
     }
 
     public ApplicationRunnerBuilder WriteToConsole()
     {
-        _outputStrategy = new ConsoleOutputStrategy(_consoleWriter);
-
+        _outputStrategy = _consoleOutputStrategy;
         return this;
     }
 
     public ApplicationRunnerBuilder WriteJson()
     {
-        _outputStrategy = new JsonFileOutputStrategy(_jsonWriter);
-
+        _outputStrategy = _jsonFileOutputStrategy;
         return this;
     }
 
     public ApplicationRunnerBuilder WriteJsonAsync()
     {
-        _outputStrategy = new JsonFileOutputAsyncStrategy(_jsonWriter);
-
+        _outputStrategy = _jsonFileOutputAsyncStrategy;
         return this;
     }
 

@@ -5,9 +5,9 @@ namespace CLI.ApplicationRunner.Strategy.Output;
 
 public class ConsoleOutputStrategy : IOutputStrategy
 {
-    private readonly IResultWriter _writer;
+    private readonly TextResultWriter _writer;
 
-    public ConsoleOutputStrategy(IResultWriter writer)
+    public ConsoleOutputStrategy(TextResultWriter writer)
     {
         _writer = writer;
     }
