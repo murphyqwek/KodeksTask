@@ -11,19 +11,21 @@ public class CsvReaderTests
     public void Read_ShouldSkipHeaderAndParseAllRows()
     {
         string csv = """
-            order_id,order_date,customer_id,product_category,region,discount,payment_method,delivery_days,customer_rating,revenue
-            1,2026-01-01,100,Electronics,Europe,0.1,Card,3,4.5,1500
-            2,2026-01-02,101,Books,Asia,0.0,Cash,5,4.8,500
+            order_id,order_date,customer_id,product_category,region,quantity,unit_price,discount,payment_method,delivery_days,customer_rating,revenue
+            1,1/1/2006,100,Electronics,Europe,2,750.00,0.1,Card,3,4.5,1500
+            2,1/2/2006,101,Books,Asia,1,500.00,0.0,Cash,5,4.8,500
             """;
 
         using var textReader = new StringReader(csv);
 
         var firstSale = CreateSale(
             orderId: 1,
-            orderDate: new DateOnly(2026, 1, 1),
+            orderDate: new DateOnly(2006, 1, 1),
             customerId: 100,
             productCategory: "Electronics",
             region: "Europe",
+            quantity: 2,
+            unitPrice: 750.00m,
             discount: 0.1m,
             paymentMethod: "Card",
             deliveryDays: 3,
@@ -32,10 +34,12 @@ public class CsvReaderTests
 
         var secondSale = CreateSale(
             orderId: 2,
-            orderDate: new DateOnly(2026, 1, 2),
+            orderDate: new DateOnly(2006, 1, 2),
             customerId: 101,
             productCategory: "Books",
             region: "Asia",
+            quantity: 1,
+            unitPrice: 500.00m,
             discount: 0.0m,
             paymentMethod: "Cash",
             deliveryDays: 5,
@@ -46,12 +50,12 @@ public class CsvReaderTests
 
         parserMock
             .Setup(x => x.ParseToSale(
-                "1,2026-01-01,100,Electronics,Europe,0.1,Card,3,4.5,1500"))
+                "1,1/1/2006,100,Electronics,Europe,2,750.00,0.1,Card,3,4.5,1500"))
             .Returns(firstSale);
 
         parserMock
             .Setup(x => x.ParseToSale(
-                "2,2026-01-02,101,Books,Asia,0.0,Cash,5,4.8,500"))
+                "2,1/2/2006,101,Books,Asia,1,500.00,0.0,Cash,5,4.8,500"))
             .Returns(secondSale);
 
         var reader = new CsvReader(parserMock.Object);
@@ -65,12 +69,12 @@ public class CsvReaderTests
 
         parserMock.Verify(
             x => x.ParseToSale(
-                "1,2026-01-01,100,Electronics,Europe,0.1,Card,3,4.5,1500"),
+                "1,1/1/2006,100,Electronics,Europe,2,750.00,0.1,Card,3,4.5,1500"),
             Times.Once);
 
         parserMock.Verify(
             x => x.ParseToSale(
-                "2,2026-01-02,101,Books,Asia,0.0,Cash,5,4.8,500"),
+                "2,1/2/2006,101,Books,Asia,1,500.00,0.0,Cash,5,4.8,500"),
             Times.Once);
     }
 
@@ -78,8 +82,8 @@ public class CsvReaderTests
     public async Task ReadAsync_ShouldSkipHeaderAndParseAllRows()
     {
         string csv = """
-            order_id,order_date,customer_id,product_category,region,discount,payment_method,delivery_days,customer_rating,revenue
-            1,2026-01-01,100,Electronics,Europe,0.1,Card,3,4.5,1500
+            order_id,order_date,customer_id,product_category,region,quantity,unit_price,discount,payment_method,delivery_days,customer_rating,revenue
+            1,1/1/2026,100,Electronics,Europe,2,750.00,0.1,Card,3,4.5,1500
             """;
 
         using var textReader = new StringReader(csv);
@@ -90,6 +94,8 @@ public class CsvReaderTests
             customerId: 100,
             productCategory: "Electronics",
             region: "Europe",
+            quantity: 2,
+            unitPrice: 750.00m,
             discount: 0.1m,
             paymentMethod: "Card",
             deliveryDays: 3,
@@ -100,7 +106,7 @@ public class CsvReaderTests
 
         parserMock
             .Setup(x => x.ParseToSale(
-                "1,2026-01-01,100,Electronics,Europe,0.1,Card,3,4.5,1500"))
+                "1,1/1/2026,100,Electronics,Europe,2,750.00,0.1,Card,3,4.5,1500"))
             .Returns(sale);
 
         var reader = new CsvReader(parserMock.Object);
@@ -112,7 +118,7 @@ public class CsvReaderTests
 
         parserMock.Verify(
             x => x.ParseToSale(
-                "1,2026-01-01,100,Electronics,Europe,0.1,Card,3,4.5,1500"),
+                "1,1/1/2026,100,Electronics,Europe,2,750.00,0.1,Card,3,4.5,1500"),
             Times.Once);
     }
 
@@ -122,6 +128,8 @@ public class CsvReaderTests
         int customerId,
         string productCategory,
         string region,
+        int quantity,
+        decimal unitPrice,
         decimal discount,
         string paymentMethod,
         int deliveryDays,
@@ -135,6 +143,8 @@ public class CsvReaderTests
             CustomerId = customerId,
             ProductCategory = productCategory,
             Region = region,
+            Quantity = quantity,
+            UnitPrice = unitPrice,
             Discount = discount,
             PaymentMethod = paymentMethod,
             DeliveryDays = deliveryDays,

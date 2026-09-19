@@ -5,7 +5,7 @@ namespace CLI.CommandLine;
 
 public sealed class CommandLineParser
 {
-    private const string DateFormat = "yyyy-MM-dd";
+    private const string DateFormat = "M/d/yyyy";
 
     public CommandLineArguments Parse(string[] args)
     {
@@ -34,6 +34,8 @@ public sealed class CommandLineParser
         var startDate = ParseDate(GetOptional(arguments, "start-date"), "start-date");
 
         var endDate = ParseDate(GetOptional(arguments, "end-date"), "end-date");
+
+        ValidateOutputPath(mode, outputPath);
 
         ValidateDates(startDate, endDate);
 
@@ -119,9 +121,7 @@ public sealed class CommandLineParser
         return mode;
     }
 
-    private static DateOnly? ParseDate(
-        string? value,
-        string argumentName)
+    private static DateOnly? ParseDate(string? value, string argumentName)
     {
         if (value is null)
         {
@@ -142,9 +142,7 @@ public sealed class CommandLineParser
         return date;
     }
 
-    private static void ValidateDates(
-        DateOnly? startDate,
-        DateOnly? endDate)
+    private static void ValidateDates(DateOnly? startDate, DateOnly? endDate)
     {
         if (startDate.HasValue &&
             endDate.HasValue &&
@@ -152,6 +150,20 @@ public sealed class CommandLineParser
         {
             throw new ArgumentException(
                 "'--start-date' must be earlier than '--end-date'.");
+        }
+    }
+
+    private static void ValidateOutputPath(ApplicationMode mode, string? outputPath)
+    {
+        var requiresOutput = mode is
+            ApplicationMode.File or
+            ApplicationMode.Async or
+            ApplicationMode.Full;
+
+        if (requiresOutput && string.IsNullOrWhiteSpace(outputPath))
+        {
+            throw new ArgumentException(
+                $"Argument '--output' is required for '{mode.ToString().ToLowerInvariant()}' mode.");
         }
     }
 }

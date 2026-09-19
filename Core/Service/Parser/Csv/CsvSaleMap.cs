@@ -16,7 +16,7 @@ public sealed class CsvSaleMap : ClassMap<Sale>
             .Validate(
                 args => !string.IsNullOrWhiteSpace(args.Field),
                 args => "OrderDate cannot be empty")
-            .TypeConverterOption.Format("yyyy-MM-dd");
+            .TypeConverterOption.Format("M/d/yyyy");
 
         Map(x => x.CustomerId)
             .Index(2)
@@ -35,33 +35,45 @@ public sealed class CsvSaleMap : ClassMap<Sale>
             .Validate(
                 args => !string.IsNullOrWhiteSpace(args.Field),
                 args => "Region cannot be empty");
+        
+        Map(x => x.Quantity)
+            .Index(5)
+            .Validate(
+                args => !string.IsNullOrWhiteSpace(args.Field),
+                args => "Quantity cannot be empty");
+        
+        Map(x => x.UnitPrice)
+            .Index(6)
+            .Validate(
+                args => !string.IsNullOrWhiteSpace(args.Field),
+                args => "Quantity cannot be empty"); 
 
         Map(x => x.Discount)
-            .Index(5)
+            .Index(7)
             .Validate(
                 args => !string.IsNullOrWhiteSpace(args.Field),
                 args => "Discount cannot be empty");
 
         Map(x => x.PaymentMethod)
-            .Index(6)
+            .Index(8)
             .Validate(
                 args => !string.IsNullOrWhiteSpace(args.Field),
                 args => "PaymentMethod cannot be empty");
 
         Map(x => x.DeliveryDays)
-            .Index(7)
+            .Index(9)
             .Validate(
                 args => !string.IsNullOrWhiteSpace(args.Field),
                 args => "DeliveryDays cannot be empty");
 
         Map(x => x.CustomerRating)
-            .Index(8)
+            .Index(10)
             .Validate(
                 args => !string.IsNullOrWhiteSpace(args.Field),
                 args => "CustomerRating cannot be empty");
 
         Map(x => x.Revenue)
-            .Index(9)
+            .Index(11)
             .Validate(
                 args => !string.IsNullOrWhiteSpace(args.Field),
                 args => "Revenue cannot be empty");

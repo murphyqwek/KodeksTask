@@ -11,7 +11,8 @@ public class CsvParserTests
     [Fact]
     public void ParseToSale_ValidCsvString_ReturnsSale()
     {
-        string csv = "1,2026-09-18,42,Electronics,Europe,0.15,Card,3,4.8,1500.50";
+        const string csv =
+            "1,9/18/2026,42,Electronics,Europe,2,750.25,0.15,Card,3,4.8,1500.50";
 
         var sale = _parser.ParseToSale(csv);
 
@@ -20,6 +21,10 @@ public class CsvParserTests
         Assert.Equal(42, sale.CustomerId);
         Assert.Equal("Electronics", sale.ProductCategory);
         Assert.Equal("Europe", sale.Region);
+
+        Assert.Equal(2, sale.Quantity);
+        Assert.Equal(750.25m, sale.UnitPrice);
+
         Assert.Equal(0.15m, sale.Discount);
         Assert.Equal("Card", sale.PaymentMethod);
         Assert.Equal(3, sale.DeliveryDays);
@@ -40,9 +45,11 @@ public class CsvParserTests
     [Fact]
     public void ParseToSale_InvalidDateFormat_ThrowsSaleParsingException()
     {
-        string csv = "1,18.09.2026,42,Electronics,Europe,0.15,Card,3,4.8,1500.50";
+        const string csv =
+            "1,18.09.2026,42,Electronics,Europe,2,750.25,0.15,Card,3,4.8,1500.50";
 
-        var exception = Assert.Throws<SaleParsingException>(() => _parser.ParseToSale(csv));
+        var exception = Assert.Throws<SaleParsingException>(
+            () => _parser.ParseToSale(csv));
 
         Assert.NotNull(exception.InnerException);
     }

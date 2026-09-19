@@ -35,7 +35,7 @@ public sealed class CsvParser : ISaleParser
         }
         catch (FieldValidationException ex)
         {
-            throw new SaleParsingException($"Failed to parse sale: {ex.Message}", ex);
+            throw new SaleParsingException($"Failed to parse sale: {saleString}", ex);
         }
         catch (ReaderException ex) when (ex.InnerException is TypeConverterException typeException)
         {
@@ -51,7 +51,7 @@ public sealed class CsvParser : ISaleParser
         }
         catch (CsvHelperException ex)
         {
-            throw new SaleParsingException($"Failed to parse sale: {ex.Message}", ex);
+            throw new SaleParsingException($"Failed to parse sale: {saleString}", ex);
         }
     }
 }

@@ -12,10 +12,10 @@ public class CommandLineParserTests
         string[] args =
         [
             "--mode", "parallel",
-            "--input", "sales.csv",
-            "--output", "result.json",
-            "--start-date", "2026-01-01",
-            "--end-date", "2026-09-01"
+        "--input", "sales.csv",
+        "--output", "result.json",
+        "--start-date", "1/1/2026",
+        "--end-date", "1/2/2026"
         ];
 
         var result = _parser.Parse(args);
@@ -23,14 +23,16 @@ public class CommandLineParserTests
         Assert.False(result.IsHelp);
 
         Assert.Equal(ApplicationMode.Parallel, result.Mode);
-
         Assert.Equal("sales.csv", result.Options.InputPath);
-
         Assert.Equal("result.json", result.Options.OutputPath);
 
-        Assert.Equal(new DateOnly(2026, 1, 1), result.Options.StartDate);
+        Assert.Equal(
+            new DateOnly(2026, 1, 1),
+            result.Options.StartDate);
 
-        Assert.Equal(new DateOnly(2026, 9, 1), result.Options.EndDate);
+        Assert.Equal(
+            new DateOnly(2026, 1, 2),
+            result.Options.EndDate);
     }
 
     [Theory]
@@ -131,8 +133,8 @@ public class CommandLineParserTests
         [
             "--mode", "console",
             "--input", "sales.csv",
-            "--start-date", "2026-09-10",
-            "--end-date", "2026-09-01"
+            "--start-date", "9/10/20026",
+            "--end-date", "9/1/20026"
         ];
 
         var exception = Assert.Throws<ArgumentException>(() => _parser.Parse(args));
@@ -147,8 +149,8 @@ public class CommandLineParserTests
         [
             "--mode", "console",
             "--input", "sales.csv",
-            "--start-date", "2026-09-01",
-            "--end-date", "2026-09-01"
+            "--start-date", "9/10/20026",
+            "--end-date", "9/10/20026"
         ];
 
         Assert.Throws<ArgumentException>(() => _parser.Parse(args));
