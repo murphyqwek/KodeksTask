@@ -1,4 +1,6 @@
-﻿using CLI.CommandLine;
+﻿using CLI.ApplicationRunner;
+using CLI.CommandLine;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace CLI;
 
@@ -26,7 +28,16 @@ public static class Program
                 return 0;
             }
 
-            var runner = BuildApplicationRunner(arguments);
+            var services = new ServiceCollection();
+
+            services.AddApplicationServices();
+
+            await using var serviceProvider = services.BuildServiceProvider();
+
+            var builder =
+                serviceProvider.GetRequiredService<ApplicationRunnerBuilder>();
+
+            var runner = ApplicationRunnerBuilderHelper.BuildApplicationRunner(arguments, builder);
 
             await runner.RunAsync(arguments.Options, cancellationTokenSource.Token);
 
@@ -36,11 +47,6 @@ public static class Program
         {
             return GlobalExceptionHandler.Handle(exception);
         }
-    }
-
-    private static ApplicationRunner.ApplicationRunner BuildApplicationRunner(CommandLineArguments arguments)
-    {
-        throw new NotImplementedException();
     }
 
     private static void PrintHelp()
