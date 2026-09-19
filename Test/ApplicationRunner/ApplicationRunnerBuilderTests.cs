@@ -1,4 +1,7 @@
 ﻿using CLI.ApplicationRunner;
+using CLI.ApplicationRunner.Strategy.Analytics;
+using CLI.ApplicationRunner.Strategy.Input;
+using CLI.ApplicationRunner.Strategy.Output;
 using Core.Service.Analytics;
 using Core.Service.Csv;
 using Core.Service.Writer;
@@ -10,11 +13,23 @@ public sealed class ApplicationRunnerBuilderTests
 {
     private static ApplicationRunnerBuilder CreateBuilder()
     {
+        var csvReader = Mock.Of<ICsvReader>();
+        var analyticsService = Mock.Of<IAnalyticsService>();
+
+        var textWriter = new TextResultWriter();
+        var jsonWriter = new JsonResultWriter();
+
         return new ApplicationRunnerBuilder(
-            Mock.Of<ICsvReader>(),
-            Mock.Of<IAnalyticsService>(),
-            new TextResultWriter(),
-            new JsonResultWriter());
+            new SyncInputStrategy(csvReader),
+            new AsyncInputStrategy(csvReader),
+
+            new SequentialAnalyticsStrategy(analyticsService),
+            new ParallelAnalyticsStrategy(analyticsService),
+            new AsyncAnalyticsStrategy(analyticsService),
+
+            new ConsoleOutputStrategy(textWriter),
+            new JsonFileOutputStrategy(jsonWriter),
+            new JsonFileOutputAsyncStrategy(jsonWriter));
     }
 
     [Fact]
