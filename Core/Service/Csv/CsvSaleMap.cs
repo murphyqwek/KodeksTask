@@ -46,7 +46,7 @@ public sealed class CsvSaleMap : ClassMap<Sale>
             .Index(6)
             .Validate(
                 args => !string.IsNullOrWhiteSpace(args.Field),
-                args => "Quantity cannot be empty"); 
+                args => "UnitPrice cannot be empty"); 
 
         Map(x => x.Discount)
             .Index(7)

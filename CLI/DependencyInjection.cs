@@ -4,8 +4,6 @@ using CLI.ApplicationRunner.Strategy.Input;
 using CLI.ApplicationRunner.Strategy.Output;
 using Core.Service.Analytics;
 using Core.Service.Csv;
-using Core.Service.Parser;
-using Core.Service.Parser.Csv;
 using Core.Service.Writer;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -14,7 +12,6 @@ public static class DependencyInjection
     public static IServiceCollection AddApplicationServices(this IServiceCollection services)
     {
         services.AddSingleton<IAnalyticsService, AnalyticsService>();
-        services.AddSingleton<ISaleParser, CsvParser>();
 
         services.AddSingleton<ICsvReader, CsvReader>();
 

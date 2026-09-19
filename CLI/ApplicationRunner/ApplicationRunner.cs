@@ -1,6 +1,7 @@
 ﻿using CLI.ApplicationRunner.Strategy.Analytics;
 using CLI.ApplicationRunner.Strategy.Input;
 using CLI.ApplicationRunner.Strategy.Output;
+using System.Diagnostics;
 
 namespace CLI.ApplicationRunner;
 
@@ -24,20 +25,40 @@ public class ApplicationRunner
     {
         ValidateOptions(options);
 
+        var total = Stopwatch.StartNew();
+
+        var readWatch = Stopwatch.StartNew();
+
         var sales = await _inputStrategy.ReadAsync(
             options.InputPath,
             cancellationToken);
+
+        readWatch.Stop();
+
+        var analyticsWatch = Stopwatch.StartNew();
 
         var result = await _analyticsStrategy.AnalyzeAsync(
             sales,
             options.StartDate,
             options.EndDate,
             cancellationToken);
+        analyticsWatch.Stop();
+
+        var writeWatch = Stopwatch.StartNew();
 
         await _outputStrategy.WriteAsync(
             result,
             options.OutputPath,
             cancellationToken);
+
+        writeWatch.Stop();
+
+        total.Stop();
+
+        Console.WriteLine($"Read:      {readWatch.ElapsedMilliseconds} ms");
+        Console.WriteLine($"Analytics: {analyticsWatch.ElapsedMilliseconds} ms");
+        Console.WriteLine($"Write:     {writeWatch.ElapsedMilliseconds} ms");
+        Console.WriteLine($"Total:     {total.ElapsedMilliseconds} ms");
     }
 
     private static void ValidateOptions(ApplicationRunOptions options)
