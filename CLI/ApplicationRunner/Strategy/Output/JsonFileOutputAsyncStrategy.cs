@@ -25,5 +25,7 @@ public sealed class JsonFileOutputAsyncStrategy : IOutputStrategy
         using var writer = _writerFactory(outputPath);
 
         await _writer.WriteAsync(result, writer, cancellationToken);
+
+        Console.WriteLine($"Results were successfuly saved to file: {outputPath}");
     }
 }

@@ -26,6 +26,8 @@ public sealed class JsonFileOutputStrategy : IOutputStrategy
 
         _writer.Write(result, writer);
 
+        Console.WriteLine($"Results were successfuly saved to file: {outputPath}");
+
         return Task.CompletedTask;
     }
 }
