@@ -1,4 +1,5 @@
 ﻿using CLI.Exceptions;
+using Core.Exceptions;
 
 namespace CLI;
 
@@ -12,14 +13,19 @@ public static class GlobalExceptionHandler
 
             OutputFileException ex => HandleOutputFileException(ex),
 
+            SaleParsingException ex => HandleSaleParsingException(ex),
+
             ArgumentException ex => WriteError($"Invalid arguments: {ex.Message}"),
 
-            FormatException ex => WriteError($"Invalid data format: {ex.Message}"),
-
-            OperationCanceledException => WriteError("Operation cancelled."),
+            OperationCanceledException => WriteError("Operation cancelled"),
 
             _ => HandleUnexpectedException(exception)
         };
+    }
+
+    private static int HandleSaleParsingException(SaleParsingException exception)
+    {
+        return WriteError($"Failed to parse sales data: {exception.Message}");
     }
 
     private static int HandleInputFileException(InputFileException exception)
@@ -44,7 +50,7 @@ public static class GlobalExceptionHandler
     {
         var message = exception.InnerException switch
         {
-            DirectoryNotFoundException => $"Output directory does not exist: '{exception.Path}'",
+            DirectoryNotFoundException =>$"Output directory does not exist: '{exception.Path}'",
 
             UnauthorizedAccessException => $"No permission to create or write output file: '{exception.Path}'",
 
