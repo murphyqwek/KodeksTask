@@ -1,4 +1,5 @@
 ﻿using CLI.ApplicationRunner.Strategy.Output;
+using CLI.Exceptions;
 using Core.Model.Analytics;
 using Core.Service.Writer;
 
@@ -15,17 +16,27 @@ public sealed class JsonFileOutputAsyncStrategy : IOutputStrategy
 
     public async Task WriteAsync(AnalyticsResult result, string? outputPath, CancellationToken cancellationToken = default)
     {
-        cancellationToken.ThrowIfCancellationRequested();
-
-        if (string.IsNullOrWhiteSpace(outputPath))
+        try
         {
-            throw new ArgumentException("Output path is required for file output", nameof(outputPath));
+            cancellationToken.ThrowIfCancellationRequested();
+
+            if (string.IsNullOrWhiteSpace(outputPath))
+            {
+                throw new ArgumentException("Output path is required for file output", nameof(outputPath));
+            }
+
+            using var writer = _writerFactory(outputPath);
+
+            await _writer.WriteAsync(result, writer, cancellationToken);
+
+            Console.WriteLine($"Results were successfuly saved to file: {outputPath}");
         }
-
-        using var writer = _writerFactory(outputPath);
-
-        await _writer.WriteAsync(result, writer, cancellationToken);
-
-        Console.WriteLine($"Results were successfuly saved to file: {outputPath}");
+        catch (Exception ex) when (ex is
+            DirectoryNotFoundException or
+            UnauthorizedAccessException or
+            IOException)
+        {
+            throw new OutputFileException(outputPath!, ex);
+        }
     }
 }

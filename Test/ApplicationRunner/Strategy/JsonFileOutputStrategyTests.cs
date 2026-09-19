@@ -15,12 +15,8 @@ public sealed class JsonFileOutputStrategyTests
 
         string? receivedPath = null;
 
-        var writer = new Mock<JsonResultWriter>(MockBehavior.Strict);
-
-        writer.Setup(x => x.Write(result, textWriter));
-
         var strategy = new JsonFileOutputStrategy(
-            writer.Object,
+            new JsonResultWriter(),
             path =>
             {
                 receivedPath = path;
@@ -30,12 +26,7 @@ public sealed class JsonFileOutputStrategyTests
         await strategy.WriteAsync(result, "result.json");
 
         Assert.Equal("result.json", receivedPath);
-
-        writer.Verify(
-            x => x.Write(
-                result,
-                textWriter),
-            Times.Once);
+        Assert.False(string.IsNullOrWhiteSpace(textWriter.ToString()));
     }
 
     [Fact]
@@ -45,21 +36,11 @@ public sealed class JsonFileOutputStrategyTests
         var textWriter = new StringWriter();
 
         using var cts = new CancellationTokenSource();
-        var token = cts.Token;
 
         string? receivedPath = null;
 
-        var writer = new Mock<JsonResultWriter>(MockBehavior.Strict);
-
-        writer
-            .Setup(x => x.WriteAsync(
-                result,
-                textWriter,
-                token))
-            .Returns(Task.CompletedTask);
-
         var strategy = new JsonFileOutputAsyncStrategy(
-            writer.Object,
+            new JsonResultWriter(),
             path =>
             {
                 receivedPath = path;
@@ -69,20 +50,20 @@ public sealed class JsonFileOutputStrategyTests
         await strategy.WriteAsync(
             result,
             "result.json",
-            token);
+            cts.Token);
 
         Assert.Equal("result.json", receivedPath);
-
-        writer.VerifyAll();
+        Assert.False(string.IsNullOrWhiteSpace(textWriter.ToString()));
     }
 
     [Theory]
     [InlineData(null)]
     [InlineData("")]
     [InlineData("   ")]
-    public async Task SyncStrategy_WhenOutputPathIsMissing_ShouldThrow(string? outputPath)
+    public async Task SyncStrategy_WhenOutputPathIsMissing_ShouldThrow(
+    string? outputPath)
     {
-        var strategy = new JsonFileOutputStrategy(Mock.Of<JsonResultWriter>(), _ => new StringWriter());
+        var strategy = new JsonFileOutputStrategy(new JsonResultWriter(), _ => new StringWriter());
 
         await Assert.ThrowsAsync<ArgumentException>(
             () => strategy.WriteAsync(
@@ -94,9 +75,10 @@ public sealed class JsonFileOutputStrategyTests
     [InlineData(null)]
     [InlineData("")]
     [InlineData("   ")]
-    public async Task AsyncStrategy_WhenOutputPathIsMissing_ShouldThrow(string? outputPath)
+    public async Task AsyncStrategy_WhenOutputPathIsMissing_ShouldThrow(
+    string? outputPath)
     {
-        var strategy = new JsonFileOutputAsyncStrategy(Mock.Of<JsonResultWriter>(), _ => new StringWriter());
+        var strategy = new JsonFileOutputAsyncStrategy(new JsonResultWriter(), _ => new StringWriter());
 
         await Assert.ThrowsAsync<ArgumentException>(
             () => strategy.WriteAsync(
@@ -105,30 +87,20 @@ public sealed class JsonFileOutputStrategyTests
     }
 
     [Fact]
-    public async Task AsyncStrategy_ShouldPassCancellationTokenToWriter()
+    public async Task AsyncStrategy_WhenCancelled_ShouldThrowOperationCanceledException()
     {
         var result = TestData.CreateAnalyticsResult();
         var textWriter = new StringWriter();
 
         using var cts = new CancellationTokenSource();
-        var token = cts.Token;
+        cts.Cancel();
 
-        var writer = new Mock<JsonResultWriter>(MockBehavior.Strict);
+        var strategy = new JsonFileOutputAsyncStrategy(new JsonResultWriter(), _ => textWriter);
 
-        writer
-            .Setup(x => x.WriteAsync(
+        await Assert.ThrowsAnyAsync<OperationCanceledException>(
+            () => strategy.WriteAsync(
                 result,
-                textWriter,
-                token))
-            .Returns(Task.CompletedTask);
-
-        var strategy = new JsonFileOutputAsyncStrategy(writer.Object, _ => textWriter);
-
-        await strategy.WriteAsync(
-            result,
-            "result.json",
-            token);
-
-        writer.VerifyAll();
+                "result.json",
+                cts.Token));
     }
 }

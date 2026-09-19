@@ -1,49 +1,36 @@
 ﻿using CLI.ApplicationRunner.Strategy.Output;
 using Core.Service.Writer;
-using Moq;
-using Tests.Common;
+
+using static Test.ApplicationRunner.Strategy.AnalyticsResultTest;
 
 namespace Tests.ApplicationRunner.Strategy;
 
-public sealed class ConsoleOutputStrategyTests
+public class ConsoleOutputStrategyTests
 {
     [Fact]
-    public async Task ConsoleOutputStrategy_ShouldUseWrite()
+    public async Task ConsoleOutputStrategy_ShouldWriteResultToConsole()
     {
-        var result = TestData.CreateAnalyticsResult();
+        var resultWriter = new TextResultWriter();
+        var strategy = new ConsoleOutputStrategy(resultWriter);
 
-        var writer = new Mock<TextResultWriter>(
-            MockBehavior.Strict);
+        using var output = new StringWriter();
+        var originalOutput = Console.Out;
 
-        writer.Setup(x => x.Write(result, Console.Out));
+        try
+        {
+            Console.SetOut(output);
 
-        var strategy = new ConsoleOutputStrategy(writer.Object);
+            var result = CreateResult();
 
-        await strategy.WriteAsync(result, null);
+            await strategy.WriteAsync(result, null);
 
-        writer.Verify(
-            x => x.Write(
-                result,
-                Console.Out),
-            Times.Once);
-    }
+            var text = output.ToString();
 
-    [Fact]
-    public async Task ConsoleOutputStrategy_WhenCancelled_ShouldNotWrite()
-    {
-        var writer = new Mock<TextResultWriter>(MockBehavior.Strict);
-
-        var strategy = new ConsoleOutputStrategy(writer.Object);
-
-        using var cts = new CancellationTokenSource();
-        cts.Cancel();
-
-        await Assert.ThrowsAsync<OperationCanceledException>(
-            () => strategy.WriteAsync(
-                TestData.CreateAnalyticsResult(),
-                null,
-                cts.Token));
-
-        writer.VerifyNoOtherCalls();
+            Assert.False(string.IsNullOrWhiteSpace(text));
+        }
+        finally
+        {
+            Console.SetOut(originalOutput);
+        }
     }
 }

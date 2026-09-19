@@ -1,4 +1,5 @@
-﻿using Core.Model;
+﻿using CLI.Exceptions;
+using Core.Model;
 using Core.Service.Csv;
 
 namespace CLI.ApplicationRunner.Strategy.Input;
@@ -16,13 +17,21 @@ public sealed class AsyncInputStrategy : IInputStrategy
 
     public async Task<IReadOnlyList<Sale>> ReadAsync(string inputPath, CancellationToken cancellationToken = default)
     {
-        cancellationToken.ThrowIfCancellationRequested();
+        try
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            using var reader = _readerFactory(inputPath);
 
-        using var reader = _readerFactory(inputPath);
-
-        return await _csvReader.ReadAsync(
-            reader,
-            cancellationToken);
+            return await _csvReader.ReadAsync(reader, cancellationToken);
+        }
+        catch (Exception ex) when (ex is
+            FileNotFoundException or
+            DirectoryNotFoundException or
+            UnauthorizedAccessException or
+            IOException)
+        {
+            throw new InputFileException(inputPath, ex);
+        }
     }
 
     private static TextReader CreateReader(string inputPath)

@@ -1,9 +1,15 @@
-﻿namespace CLI;
+﻿using CLI.CommandLine;
 
-internal class Program
+namespace CLI;
+
+public class Program
 {
     static void Main(string[] args)
     {
-        Console.WriteLine("Hello, World!");
+        var parser = new CommandLineParser();
+
+        var commandArgs = parser.Parse(args);
+
+
     }
 }
