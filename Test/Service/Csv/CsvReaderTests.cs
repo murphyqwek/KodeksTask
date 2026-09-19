@@ -10,7 +10,7 @@ public class CsvReaderTests
     [Fact]
     public void Read_ShouldSkipHeaderAndParseAllRows()
     {
-        const string csv = """
+        string csv = """
             order_id,order_date,customer_id,product_category,region,discount,payment_method,delivery_days,customer_rating,revenue
             1,2026-01-01,100,Electronics,Europe,0.1,Card,3,4.5,1500
             2,2026-01-02,101,Books,Asia,0.0,Cash,5,4.8,500
@@ -77,7 +77,7 @@ public class CsvReaderTests
     [Fact]
     public async Task ReadAsync_ShouldSkipHeaderAndParseAllRows()
     {
-        const string csv = """
+        string csv = """
             order_id,order_date,customer_id,product_category,region,discount,payment_method,delivery_days,customer_rating,revenue
             1,2026-01-01,100,Electronics,Europe,0.1,Card,3,4.5,1500
             """;
