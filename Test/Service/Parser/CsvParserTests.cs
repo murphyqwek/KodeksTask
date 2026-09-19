@@ -1,10 +1,8 @@
 ﻿using Core.Exceptions;
 using Core.Service.Parser;
 using Core.Service.Parser.Csv;
-using CsvHelper.TypeConversion;
-using System.Net.ServerSentEvents;
 
-namespace Core.Tests.Service.Parser;
+namespace Tests.Service.Parser;
 
 public class CsvParserTests
 {
